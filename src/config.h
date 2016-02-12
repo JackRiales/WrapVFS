@@ -26,6 +26,8 @@
     WRAP_ROOT_SYMBOL    | "/"       |   The symbol to use for the root directory.
     WRAP_TEMP_ROOT_SYMB | "@/"      |   The symbol used to designate a temporary root directory.
     WRAP_PATH_SEPERATOR | "\\"      |   The symbol used to seperate paths.
+    WRAP_INODE_PARENT   | ".."      |   The symbol to demarkate the parent of an inode.
+    WRAP_INODE_THIS     | "."       |   The symbol an inode uses to demarkate itself.
     WRAP_USE_META       | true      |   Should wrap encode file metadata in meta files, or embed them onto the headers of files?
     WRAP_META_HIDDEN    | true      |   Should wrap "hide" metafiles by appending the hidden symbol to them on creation?
 */
@@ -33,11 +35,14 @@
 #ifndef WRAP_CONFIG_H
 #define WRAP_CONFIG_H
 
-const char *WRAP_FILE_EXT       = ".wrap";
-const char *WRAP_META_FILE_EXT  = ".meta";
-const char *WRAP_ROOT_SYMBOL    = "/";
-const char *WRAP_PATH_SEPERATOR = "\\";
-const int   WRAP_USE_META       = 1;
-const int   WRAP_META_HIDDEN    = 1;
+const char *WRAP_FILE_EXT           = ".wrap";
+const char *WRAP_META_FILE_EXT      = ".meta";
+const char *WRAP_ROOT_SYMBOL        = "/";
+const char *WRAP_TEMP_ROOT_SYMBOL   = "@/";
+const char *WRAP_PATH_SEPERATOR     = "/";
+const char *WRAP_INODE_PARENT       = "..";
+const char *WRAP_INODE_THIS         = ".";
+const int   WRAP_USE_META           = 1;
+const int   WRAP_META_HIDDEN        = 1;
 
 #endif // WRAP_CONFIG_H
