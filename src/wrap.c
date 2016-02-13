@@ -19,6 +19,28 @@
 */
 
 #include "wrap.h"
+#include "util.h"
+#include "config.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+/*===============================================================*/
+int main(int argc, char *argv[]) {
+    #ifdef __DEBUG
+    if (!wrap_mkfs("Testing", 1024*1024, NULL)) {
+        return -1;
+    }
+    return 0;
+    #else
+    if (argc > 1) {
+
+    } else {
+        return 1;
+    }
+    #endif
+}
 
 /*===============================================================*/
 void wrap_init() {
@@ -31,11 +53,47 @@ void wrap_shutdown() {
 }
 
 /*===============================================================*/
-void wrap_mkfs(char *path, uint64_t alloc) {
+bool wrap_mkfs(char *fsname, uint64_t alloc, char *altpath) {
+    // Check if fsname contains .wrap. If not, it needs to be applied.
+    char *fsname_full;
+    if (strstr(fsname, WRAP_FILE_EXT) != NULL) {
+        fsname_full = fsname;
+    } else {
+        fsname_full = concat_string(fsname, WRAP_FILE_EXT);
+    }
 
-}
+    // Form a string of the path we want
+    char *fullpath;
+    if (altpath == NULL) {
+        fullpath = concat_string("./", fsname_full);
+    } else {
+        fullpath = concat_string(altpath, fsname_full);
+    }
 
-/*===============================================================*/
-int main(int argc, char *argv[]) {
-    ;
+    // Check if the fullpath already exists.
+    if (access(fullpath, F_OK) != -1) {
+        char cfrm[2];
+        if (!confirm(cfrm, "WARNING: File already exists. Are you sure you want to make a new file system here? [y/N]: ", false)) {
+            return false;
+        }
+    }
+
+    // Attempt to create the file for writing.
+    FILE *f = fopen(fullpath, "w");
+
+    // Exception check
+    if (f == NULL) {
+        // Error here
+        return false;
+    }
+
+    // Preallocate space to it
+    ftruncate(fileno(f), alloc);
+    fclose(f);
+
+    // Free up the strings we made
+    free(fsname_full);
+    free(fullpath);
+
+    return true;
 }

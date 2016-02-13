@@ -38,6 +38,9 @@ typedef struct {
 
     // Is the storage capacity allowed to expand if needed?
     bool dynamic;
+
+    // The file system's password. If not null, will be required to open.
+    char *pwd;
 } wrap_fsinf;
 
 /*
@@ -74,15 +77,22 @@ struct wrap_inode {
     // The meta information about the literal entity.
     wrap_metainf meta;
 
+    // The node's security password. If not null, will require authentication in order to use.
+    char *pwd;
+
     // The parent to this inode.
     struct wrap_inode *parent;
 
     // An array of pointers, with an undefined length, to inodes serving as children.
     struct wrap_inode **children;
-} wrap_inode_primary;
+};
+typedef struct wrap_inode wrap_inode;
+
+// The real path to the .wrap file currently loaded and being used.
+char *loaded_fs_path;
 
 // Reference to the next free inode in the file system.
-struct wrap_inode *NEXT_FREE_INODE;
+wrap_inode *NEXT_FREE_INODE;
 
 /*
     Initialize and shutdown the VFS.
@@ -93,12 +103,22 @@ void wrap_shutdown();
 
 /*
     Make an empty file system in the file located at the given path.
+    Returns true if a .wrap file was able to form and allocate. False if not.
+    fsname The name of the file system. Must end with the wrap file extension. If not, it will be applied.
+    alloc How much space to allocate to the file system.
+    altpath Where to put the file. If NULL, will be set to wherever the program is run.
 */
-void wrap_mkfs(char *path, uint64_t alloc);
+bool wrap_mkfs(char *fsname, uint64_t alloc, char *altpath);
 
 /*
     Checks the integrity of the file system.
+    Returns true if integrity is found intact, false if not.
 */
-void wrap_fsck();
+bool wrap_fsck();
+
+/*
+    Applies a password to the file system.
+*/
+bool wrap_fspwd(char *pass);
 
 #endif // WRAP_H
