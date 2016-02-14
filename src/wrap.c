@@ -54,6 +54,12 @@ void wrap_shutdown() {
 
 /*===============================================================*/
 bool wrap_mkfs(char *fsname, uint64_t alloc, char *altpath) {
+    // Check and ensure that there's enough data space to contain at least the basic system
+    if (alloc < sizeof(wrap_fsinf) + sizeof(wrap_inode) * 2) {
+        printf("ERROR: Allocated size is not enough to hold basic system.");
+        return false;
+    }
+
     // Check if fsname contains .wrap. If not, it needs to be applied.
     char *fsname_full;
     if (strstr(fsname, WRAP_FILE_EXT) != NULL) {
@@ -89,6 +95,24 @@ bool wrap_mkfs(char *fsname, uint64_t alloc, char *altpath) {
 
     // Preallocate space to it
     ftruncate(fileno(f), alloc);
+
+    // Mark the fs now as loaded
+    loaded_fs_path = fullpath;
+
+    // Generate file system info struct
+    wrap_fsinf fsysinfo;
+    fsysinfo.real_path = fullpath;
+    fsysinfo.storage_cap = alloc;
+    fsysinfo.used_storage = 0;
+    fsysinfo.pwd = NULL;
+    time_t rawtime;
+    time (&rawtime);
+    fsysinfo.time_on_create = localtime(&rawtime);
+
+    // Put it to the primary inode
+    // Write the inode to the file system
+
+    // Close the file
     fclose(f);
 
     // Free up the strings we made

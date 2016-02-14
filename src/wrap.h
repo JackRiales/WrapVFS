@@ -23,6 +23,7 @@
 
 #include <stdint.h>     // special int types
 #include <stdbool.h>    // bool type
+#include <time.h>       // time and date info
 
 /*
     Wrap file system information.
@@ -36,11 +37,14 @@ typedef struct {
     // Alternatively, the maximum amount of space the fs can store, unless dynamic is turned on.
     uint64_t storage_cap;
 
-    // Is the storage capacity allowed to expand if needed?
-    bool dynamic;
+    // The space actually being used in the fs.
+    uint64_t used_storage;
 
     // The file system's password. If not null, will be required to open.
     char *pwd;
+
+    // The time and date when the file system was generated.
+    struct tm * time_on_create;
 } wrap_fsinf;
 
 /*
@@ -72,7 +76,7 @@ struct wrap_inode {
 
     // The actual data contained within this inode.
     // Should be NULL if this inode is a directory.
-    char *data;
+    void *data;
 
     // The meta information about the literal entity.
     wrap_metainf meta;
@@ -88,11 +92,11 @@ struct wrap_inode {
 };
 typedef struct wrap_inode wrap_inode;
 
+// The primary inode will contain the file system info
+wrap_inode primary_inode;
+
 // The real path to the .wrap file currently loaded and being used.
 char *loaded_fs_path;
-
-// Reference to the next free inode in the file system.
-wrap_inode *NEXT_FREE_INODE;
 
 /*
     Initialize and shutdown the VFS.
@@ -115,6 +119,11 @@ bool wrap_mkfs(char *fsname, uint64_t alloc, char *altpath);
     Returns true if integrity is found intact, false if not.
 */
 bool wrap_fsck();
+
+/*
+
+*/
+bool wrap_write(wrap_inode *inode);
 
 /*
     Applies a password to the file system.
