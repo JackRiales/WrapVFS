@@ -31,7 +31,8 @@ char *concat_string(const char *str1, const char *str2) {
     return concat;
 }
 
-bool confirm(char str[], char *cmessage, bool def) {
+bool confirm(char *cmessage, bool def) {
+    char str[2];
     if (cmessage == NULL) {
         cmessage = "Confirm [Y/N]: ";
     }

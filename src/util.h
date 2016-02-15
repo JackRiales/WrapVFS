@@ -27,6 +27,6 @@
 char* concat_string(const char *str1, const char *str2);
 
 // Displays a yes or no prompt, and returns true on Y and false on N
-bool confirm(char str[], char *cmessage, bool def);
+bool confirm(char *cmessage, bool def);
 
 #endif // UTIL_H
