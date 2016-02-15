@@ -19,6 +19,7 @@
 */
 
 #include "wrap.h"
+#include "inode.h"
 #include "util.h"
 #include "config.h"
 #include <stdio.h>
@@ -28,18 +29,18 @@
 
 /*===============================================================*/
 int main(int argc, char *argv[]) {
-    #ifdef __DEBUG
+    //#ifdef __DEBUG
     if (!wrap_mkfs("Testing", 1024*1024, NULL)) {
-        return -1;
+        return WRAP_EXIT_FAILURE;
     }
-    return 0;
-    #else
-    if (argc > 1) {
+    return WRAP_EXIT_SUCCESS;
+    //#else
+    //if (argc > 1) {
 
-    } else {
-        return 1;
-    }
-    #endif
+    //} else {
+    //    return 1;
+    //}
+    //#endif
 }
 
 /*===============================================================*/
@@ -78,14 +79,13 @@ bool wrap_mkfs(char *fsname, uint64_t alloc, char *altpath) {
 
     // Check if the fullpath already exists.
     if (access(fullpath, F_OK) != -1) {
-        char cfrm[2];
-        if (!confirm(cfrm, "WARNING: File already exists. Are you sure you want to make a new file system here? [y/N]: ", false)) {
+        if (!confirm("WARNING: File already exists. Are you sure you want to make a new file system here? [y/N]: ", false)) {
             return false;
         }
     }
 
     // Attempt to create the file for writing.
-    FILE *f = fopen(fullpath, "w");
+    FILE *f = fopen(fullpath, "wb");
 
     // Exception check
     if (f == NULL) {
@@ -101,23 +101,24 @@ bool wrap_mkfs(char *fsname, uint64_t alloc, char *altpath) {
 
     // Generate file system info struct
     wrap_fsinf fsysinfo;
-    fsysinfo.real_path = fullpath;
-    fsysinfo.storage_cap = alloc;
-    fsysinfo.used_storage = 0;
+    fsysinfo.path = fullpath;
+    fsysinfo.stor_c = alloc;
+    fsysinfo.stor_u = 0;
     fsysinfo.pwd = NULL;
     time_t rawtime;
     time (&rawtime);
-    fsysinfo.time_on_create = localtime(&rawtime);
-
-    // Put it to the primary inode
-    // Write the inode to the file system
+    fsysinfo.t_cre = rawtime;
+    fsysinfo.t_ope = rawtime;
+    fsysinfo.t_mod = rawtime;
 
     // Close the file
     fclose(f);
 
     // Free up the strings we made
     free(fsname_full);
+    fsname_full = NULL;
     free(fullpath);
+    fullpath = NULL;
 
     return true;
 }

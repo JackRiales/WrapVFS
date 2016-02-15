@@ -21,6 +21,7 @@
 #ifndef WRAP_H
 #define WRAP_H
 
+#include <stdio.h>      // FILE
 #include <stdint.h>     // special int types
 #include <stdbool.h>    // bool type
 #include <time.h>       // time and date info
@@ -31,69 +32,27 @@
 */
 typedef struct {
     // The path on the OS's file system to the file containing wrap
-    char *real_path;
-
-    // The space on disk that the fs takes up.
-    // Alternatively, the maximum amount of space the fs can store, unless dynamic is turned on.
-    uint64_t storage_cap;
-
-    // The space actually being used in the fs.
-    uint64_t used_storage;
+    char *path;
 
     // The file system's password. If not null, will be required to open.
     char *pwd;
 
+    // The space on disk that the fs takes up.
+    // Alternatively, the maximum amount of space the fs can store, unless dynamic is turned on.
+    off_t stor_c;
+
+    // The space actually being used in the fs.
+    off_t stor_u;
+
     // The time and date when the file system was generated.
-    struct tm * time_on_create;
+    time_t t_cre;
+
+    // The time and date when the file system was last opened.
+    time_t t_ope;
+
+    // The time and date when the file system was last modified.
+    time_t t_mod;
 } wrap_fsinf;
-
-/*
-    Wrap entity meta information.
-    An entity is defined as either a file or a directory in the fs.\
-        This struct will be used to write metafiles for entities.
-*/
-typedef struct {
-    bool        is_dir;
-    char*       path;
-    char*       name;
-
-    // The space allocated to this inode.
-    // Unsigned 64-bit integer used because files > 2G are pretty commmon.
-    // If the entity is a directory, value should be 0.
-    uint64_t    alloc;
-} wrap_metainf;
-
-/*
-    Wrap inode struct.
-    Represents a file or directory.
-*/
-struct wrap_inode {
-    // The unique identifier of the inode
-    int uid;
-
-    // Is this inode the root? Should never be true if this inode is a file.
-    bool is_root;
-
-    // The actual data contained within this inode.
-    // Should be NULL if this inode is a directory.
-    void *data;
-
-    // The meta information about the literal entity.
-    wrap_metainf meta;
-
-    // The node's security password. If not null, will require authentication in order to use.
-    char *pwd;
-
-    // The parent to this inode.
-    struct wrap_inode *parent;
-
-    // An array of pointers, with an undefined length, to inodes serving as children.
-    struct wrap_inode **children;
-};
-typedef struct wrap_inode wrap_inode;
-
-// The primary inode will contain the file system info
-wrap_inode primary_inode;
 
 // The real path to the .wrap file currently loaded and being used.
 char *loaded_fs_path;
@@ -119,11 +78,6 @@ bool wrap_mkfs(char *fsname, uint64_t alloc, char *altpath);
     Returns true if integrity is found intact, false if not.
 */
 bool wrap_fsck();
-
-/*
-
-*/
-bool wrap_write(wrap_inode *inode);
 
 /*
     Applies a password to the file system.

@@ -28,8 +28,11 @@
     WRAP_PATH_SEPERATOR | "\\"      |   The symbol used to seperate paths.
     WRAP_INODE_PARENT   | ".."      |   The symbol to demarkate the parent of an inode.
     WRAP_INODE_THIS     | "."       |   The symbol an inode uses to demarkate itself.
-    WRAP_USE_META       | true      |   Should wrap encode file metadata in meta files, or embed them onto the headers of files?
+    WRAP_USE_META       | true      |   Should wrap encode file metadata in meta files (true), or embed them onto the headers of files (false)?
     WRAP_META_HIDDEN    | true      |   Should wrap "hide" metafiles by appending the hidden symbol to them on creation?
+    WRAP_BLOCK_SIZE     | 512       |   The size of the datablocks that can be allocated for real containment.
+    WRAP_EXIT_FAILURE   | -1        |   Program exit code used to indicate a general error has caused the fs to quit.
+    WRAP_EXIT_SUCCESS   | 0         |   Program exit code used to indicate the user has caused the fs to quit. Best case.
 */
 
 #ifndef WRAP_CONFIG_H
@@ -44,5 +47,8 @@ const char *WRAP_INODE_PARENT       = "..";
 const char *WRAP_INODE_THIS         = ".";
 const int   WRAP_USE_META           = 1;
 const int   WRAP_META_HIDDEN        = 1;
+const int   WRAP_BLOCK_SIZE         = 512;
+const int   WRAP_EXIT_FAILURE       = -1;
+const int   WRAP_EXIT_SUCCESS       = 0;
 
 #endif // WRAP_CONFIG_H
