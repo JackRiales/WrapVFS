@@ -21,8 +21,7 @@
 #include "wrap.h"
 #include "inode.h"
 #include "util.h"
-#include "config.h"
-#include <stdio.h>
+#include "block.h"
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -30,6 +29,7 @@
 /*===============================================================*/
 int main(int argc, char *argv[]) {
     //#ifdef __DEBUG
+    printf("Size of file sys info: %ld\n", sizeof(wrap_fsinf));
     if (!wrap_mkfs("Testing", 1024*1024, NULL)) {
         return WRAP_EXIT_FAILURE;
     }
@@ -56,7 +56,7 @@ void wrap_shutdown() {
 /*===============================================================*/
 bool wrap_mkfs(char *fsname, uint64_t alloc, char *altpath) {
     // Check and ensure that there's enough data space to contain at least the basic system
-    if (alloc < sizeof(wrap_fsinf) + sizeof(wrap_inode) * 2) {
+    if (alloc < WRAP_FS_MIN_ALLOC) {
         printf("ERROR: Allocated size is not enough to hold basic system.");
         return false;
     }
@@ -110,6 +110,21 @@ bool wrap_mkfs(char *fsname, uint64_t alloc, char *altpath) {
     fsysinfo.t_cre = rawtime;
     fsysinfo.t_ope = rawtime;
     fsysinfo.t_mod = rawtime;
+
+    // Check and ensure the data block size is greater than the size of the file system info
+    if (WRAP_BLOCK_SIZE < sizeof(wrap_fsinf)) {
+        printf("Config Error: Block size ( %d ) is not large enough to hold the base system info. Please increase it to at least %ld.\n", WRAP_BLOCK_SIZE, sizeof(wrap_fsinf));
+        return WRAP_EXIT_FAILURE;
+    }
+
+    // Generate the prime datablock that will hold the file system's info.
+    wrap_datablock db_prime;
+    db_prime.id = WRAP_PRIME_ID;
+    memcpy(&db_prime.data, &fsysinfo, sizeof(fsysinfo));
+
+
+    // Write the prime data block to the file system
+    fprintf(f, "dbi:%d|%s\n", db_prime.id, db_prime.data);
 
     // Close the file
     fclose(f);

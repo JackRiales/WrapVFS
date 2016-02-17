@@ -29,6 +29,21 @@ typedef struct {
     // The unique id of this inode and the file its associated with.
     uint32_t    id;
 
+    // The number of hard links to the represented file.
+    uint64_t    links;
+
+    // Total size, in bytes. Will be 0 if its a directory.
+    off_t       size;
+
+    // Number of blocks allocated towards the data in this node.
+    uint32_t    blocks;
+
+    // Time of last access
+    time_t      t_acc;
+
+    // Time of last modification
+    time_t      t_mod;
+
 } wrap_inode;
 
 #endif

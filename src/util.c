@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+/*===============================================================*/
 char *concat_string(const char *str1, const char *str2) {
     char *concat = (char *) malloc(strlen(str1) + strlen(str2) + 1);
     strcpy(concat, str1);
@@ -31,6 +32,7 @@ char *concat_string(const char *str1, const char *str2) {
     return concat;
 }
 
+/*===============================================================*/
 bool confirm(char *cmessage, bool def) {
     char str[2];
     if (cmessage == NULL) {

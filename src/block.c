@@ -18,20 +18,25 @@
     ===============================================================
 */
 
-#ifndef BLOCK_H
-#define BLOCK_H
+#include "block.h"
 
-#include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include "config.h"
+/*===============================================================*/
+bool wrap_dbinit(wrap_datablock *db) {
+    return false;
+}
 
-typedef struct {
-    uint32_t id;
-    char data [WRAP_BLOCK_SIZE];
-} wrap_datablock;
+/*===============================================================*/
+bool wrap_dbwrite(wrap_datablock *db, FILE *f) {
+    if (db == NULL || f == NULL) {
+        return false;
+    }
 
-bool wrap_dbinit(wrap_datablock *db);
-bool wrap_dbwrite(wrap_datablock *db, FILE *f);
+    // Write the terminating string to the end of the data array
+    db->data[WRAP_BLOCK_SIZE - 1] = WRAP_BLOCK_TERM;
 
-#endif
+    fprintf(f, WRAP_BLOCK_HEADER, db->id);
+    fprintf(f, WRAP_BLOCK_HEADER_TERM);
+    fprintf(f, "%s", db->data);
+
+    return true;
+}
