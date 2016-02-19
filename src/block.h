@@ -27,11 +27,12 @@
 #include "config.h"
 
 typedef struct {
+    bool fl_init;
     uint32_t id;
-    char data [WRAP_BLOCK_SIZE];
+    unsigned char data [WRAP_BLOCK_SIZE];
 } wrap_datablock;
 
-bool wrap_dbinit(wrap_datablock *db);
+void wrap_dbinit(wrap_datablock *db);
 bool wrap_dbwrite(wrap_datablock *db, FILE *f);
 
 #endif

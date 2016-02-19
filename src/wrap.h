@@ -21,6 +21,7 @@
 #ifndef WRAP_H
 #define WRAP_H
 
+#include <sys/types.h>  // off_t
 #include <stdio.h>      // FILE
 #include <stdint.h>     // special int types
 #include <stdbool.h>    // bool type
@@ -84,4 +85,4 @@ bool wrap_fsck();
 */
 bool wrap_fspwd(char *pass);
 
-#endif // WRAP_H
+#endif

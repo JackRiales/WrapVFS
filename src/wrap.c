@@ -96,6 +96,9 @@ bool wrap_mkfs(char *fsname, uint64_t alloc, char *altpath) {
     // Preallocate space to it
     ftruncate(fileno(f), alloc);
 
+    // Seek back to the beginning (just in case)
+    fseek(f, 0, SEEK_SET);
+
     // Mark the fs now as loaded
     loaded_fs_path = fullpath;
 
@@ -119,12 +122,19 @@ bool wrap_mkfs(char *fsname, uint64_t alloc, char *altpath) {
 
     // Generate the prime datablock that will hold the file system's info.
     wrap_datablock db_prime;
+    wrap_dbinit(&db_prime);
     db_prime.id = WRAP_PRIME_ID;
-    memcpy(&db_prime.data, &fsysinfo, sizeof(fsysinfo));
+    memcpy(db_prime.data, &fsysinfo, sizeof(fsysinfo));
+    wrap_dbwrite(&db_prime, f);
 
-
-    // Write the prime data block to the file system
-    fprintf(f, "dbi:%d|%s\n", db_prime.id, db_prime.data);
+    // Testing: Write like 10 dummy blocks
+    for (int i = 0; i < 10; ++i) {
+        wrap_datablock db_temp;
+        wrap_dbinit(&db_temp);
+        db_temp.id = i;
+        memcpy(db_temp.data, &i, sizeof(int));
+        wrap_dbwrite(&db_temp, f);
+    }
 
     // Close the file
     fclose(f);

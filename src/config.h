@@ -31,6 +31,7 @@
     WRAP_BLOCK_HEADER   | "db:i%d"  |   The string used to introduce a block in the file system. '%d' is required as it representst the id.
     WRAP_BLOCK_HEADER_* | "|"       |   The symbol used to denote the beginning of the actual data in a block.
     WRAP_BLOCK_TERM     | ','       |   Symbol used to terminate data blocks in the file system.
+    WRAP_BLOCK_NULL     | '~'       |   A char used to represent that there is no real data on an index.
     WRAP_USE_META       | true      |   Should wrap encode file metadata in meta files (true), or embed them onto the headers of files (false)?
     WRAP_META_HIDDEN    | true      |   Should wrap "hide" metafiles by appending the hidden symbol to them on creation?
     WRAP_PRIME_ID       | 0         |   The id given to the prime data block, containing the file system info.
@@ -70,7 +71,8 @@ const int   WRAP_EXIT_SUCCESS       = 0;*/
 #define WRAP_INODE_THIS             "."
 #define WRAP_BLOCK_HEADER           "db:i%d"
 #define WRAP_BLOCK_HEADER_TERM      "|"
-#define WRAP_BLOCK_TERM             ','
+#define WRAP_BLOCK_TERM             '\n'
+#define WRAP_BLOCK_NULL             '~'
 #define WRAP_BLOCK_SIZE             512
 #define WRAP_USE_META               1
 #define WRAP_META_HIDDEN            1

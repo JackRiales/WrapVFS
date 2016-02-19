@@ -21,8 +21,15 @@
 #include "block.h"
 
 /*===============================================================*/
-bool wrap_dbinit(wrap_datablock *db) {
-    return false;
+void wrap_dbinit(wrap_datablock *db) {
+    /*for (int i = 0; i < WRAP_BLOCK_SIZE; i++)
+        db->data[i] = WRAP_BLOCK_NULL;*/
+
+    // Write the terminating string to the end of the data array
+    db->data[WRAP_BLOCK_SIZE - 1] = WRAP_BLOCK_TERM;
+
+    // Flag the block as initialized
+    db->fl_init = true;
 }
 
 /*===============================================================*/
@@ -31,8 +38,8 @@ bool wrap_dbwrite(wrap_datablock *db, FILE *f) {
         return false;
     }
 
-    // Write the terminating string to the end of the data array
-    db->data[WRAP_BLOCK_SIZE - 1] = WRAP_BLOCK_TERM;
+    if (!db->fl_init)
+        wrap_dbinit(db);
 
     fprintf(f, WRAP_BLOCK_HEADER, db->id);
     fprintf(f, WRAP_BLOCK_HEADER_TERM);
